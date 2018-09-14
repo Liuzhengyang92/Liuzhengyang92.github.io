@@ -1,12 +1,28 @@
 import React, { Component } from 'react';
 import {connect} from 'react-redux'
-import * as actionsType from '../../store/actions'
+import * as actionsType from '../../store/actions/actionTypes'
+
+import { withScriptjs, withGoogleMap, GoogleMap, Marker } from "react-google-maps"
 
 class Heatmap extends Component {
     render () {
+        const HOC = withScriptjs(withGoogleMap((props) =>
+            <GoogleMap
+                defaultZoom={19}
+                defaultCenter={{lat: -33.879944, lng:151.203373}}
+                >
+                {props.isMarkerShown && <Marker position={{lat: -33.879944, lng:151.203373}} />}
+            </GoogleMap>
+        ))
+
         return (
-            <div>
-            </div>
+            <HOC 
+                isMarkerShown
+                googleMapURL="https://maps.googleapis.com/maps/api/js?key=AIzaSyCg6d8ijsi0gbStSF8lTYlWN3LI5iAS0LY&libraries=geometry,drawing,places,visualization"
+                loadingElement={<div style={{ height: `100%` }} />}
+                containerElement={<div style={{ height: `400px` }} />}
+                mapElement={<div style={{ height: `100%` }} 
+            />}></HOC>
         );
     }
 }

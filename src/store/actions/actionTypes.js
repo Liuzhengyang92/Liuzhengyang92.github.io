@@ -1,0 +1,1 @@
+export const INIT_HEATMAP = 'INIT_HEATMAP';
