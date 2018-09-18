@@ -9,6 +9,8 @@ const initialState = {
     center: {lat: -33.879944, lng:151.203373},
     devices: null,
     accesspoints: null,
+    networkID: 326046,
+    dataInterval: 1,
 }
 
 const heatmapInit = ( state, action ) => {
@@ -19,7 +21,11 @@ const heatmapInit = ( state, action ) => {
 };
 
 const heatmapUpdateDevices = (state, action) => {
-    return updateObject( state, {devices: action.payload.devices});
+    return updateObject( 
+        state, 
+        {
+            devices: action.payload.devices
+        });
 };
 
 const heatmapUpdateAccessPoints = (state, action) => {
