@@ -1,46 +1,61 @@
-/* global google */
 import React, { Component } from 'react';
 import {connect} from 'react-redux'
 
 import * as actionsType from '../../store/actions/actionTypes'
 
 import style from "./Heatmap.css"
-
-let map;
+import axios from '../../axios'
 
 class Heatmap extends Component {
 
     constructor(props){
         super(props);
         this.state = {
-            // zoom: 19
         }
     }
 
-    componentDidMount(){
-        this._initMap()
+    __initMap(){
+        let map = new window.google.maps.Map(document.getElementById('map'),{
+            center: this.props.center,
+            zoom: this.props.zoom,
+            zoomControl: true,
+            scrollwheel: false,
+            streetViewControl: false,
+            mapTypeControl: false,
+            mapTypeId: 'roadmap',
+        });
+
+        let heatmapLayer = new window.google.maps.visualization.HeatmapLayer({
+            map: map
+        })
+
+        this.props.onHeatmapInit(map,heatmapLayer)
     }
 
-    _initMap () {
-        map = new window.google.maps.Map(document.getElementById('map'),{
-          center: this.props.center,
-          zoom: this.props.zoom,
-          zoomControl: true,
-          zoomControlOptions: {
-            position: window.google.maps.ControlPosition.RIGHT_CENTER
-          },
-          scrollwheel: false,
-          streetViewControl: false,
-          mapTypeControl: false,
-          mapTypeId: 'roadmap',
-        });
-      }
+    __loadData(){
+        axios.get('/v1/device/listlive?network_id=326046&offset=0&limit=10000&interval=5')
+            .then(response => {
+                const devices = response.data['Data']["deviceList"];
+                const mvc = devices.map(device => {
+                    return new window.google.maps.LatLng(device.latitude, device.longitude)
+                })
+                this.props.heatmapLayer.setData(mvc)
+                this.props.onHeatmapUpdateDevices(devices);
+            }).catch(error => {
+                console.log(error);
+            });
+    }
+
+    componentDidMount(){
+        this.__initMap();
+        this.__loadData();
+    }
 
     render () {
         return (
             <div>
                 <div className={style.maps} id="map"></div>            
-                <button onClick={() => this.props.onHeatMapInit()}>Test</button>
+                <button onClick={() => this.props.onHeatMapUpdate()}>Test</button>
             </div>
         )
     }
@@ -48,45 +63,19 @@ class Heatmap extends Component {
 
 const mapStateToProps = state => {
     return {
+        map: state.heatmap.map,
+        heatmapLayer: state.heatmap.heatmapLayer,
         zoom: state.heatmap.zoom,
         center: state.heatmap.center,
-        heatmapRawData: state.heatmap.heatmapRawData,
     };
 };
 
 const mapDispatchToProps = dispatch => {
     return {
-        onHeatMapInit: () => dispatch({type: actionsType.INIT_HEATMAP}),
+        onHeatmapInit: (map, heatmapLayer) => dispatch({type: actionsType.INIT_HEATMAP, payload:{map: map, heatmapLayer: heatmapLayer}}),
+        onHeatmapUpdateDevices: (devices) => dispatch({type: actionsType.INIT_HEATMAP, payload:{devices: devices}}),
+        onHeatmapUpdateAccessPoints: (accesspoints) => dispatch({type: actionsType.INIT_HEATMAP, payload:{accesspoints: accesspoints}}),
     };
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Heatmap);
-
-
-
-
-    // render () {
-    //     const HOC = withScriptjs(withGoogleMap((props) =>
-    //         <GoogleMap
-    //             defaultZoom={this.props.zoom}
-    //             defaultCenter={this.props.center}
-    //             >
-    //             {props.isMarkerShown && <Marker position={this.props.center} />}
-    //             <HeatmapLayer
-    //                data={this.props.heatmapData}
-    //                options={{radius: 20}} 
-    //             />
-    //             <button onClick={() => this.props.onHeatmapInit()}>Test</button>
-    //         </GoogleMap>
-    //     ))
-
-    //     return (
-    //         <HOC 
-    //             isMarkerShown
-    //             googleMapURL="https://maps.googleapis.com/maps/api/js?key=AIzaSyCg6d8ijsi0gbStSF8lTYlWN3LI5iAS0LY&libraries=geometry,drawing,places,visualization"
-    //             loadingElement={<div style={{ height: `100%` }} />}
-    //             containerElement={<div style={{ height: `600px` }} />}
-    //             mapElement={<div style={{ height: `100%` }} 
-    //         />}></HOC>
-    //     );
-    // }
