@@ -5,27 +5,25 @@ import { updateObject } from '../../shared/utility';
 const initialState = {
     map: null,
     heatmapLayer: null,
+    drawingManager: null,
     zoom: 19,
     center: {lat: -33.879944, lng:151.203373},
     devices: null,
     accesspoints: null,
     networkID: 326046,
-    dataInterval: 1,
+    apiDataInterval: 5,
 }
 
 const heatmapInit = ( state, action ) => {
     return updateObject( state, {
         map: action.payload.map, 
         heatmapLayer: action.payload.heatmapLayer,
+        drawingManager: action.payload.drawingManager,
     });
 };
 
 const heatmapUpdateDevices = (state, action) => {
-    return updateObject( 
-        state, 
-        {
-            devices: action.payload.devices
-        });
+    return updateObject( state, {devices: action.payload.devices});
 };
 
 const heatmapUpdateAccessPoints = (state, action) => {
