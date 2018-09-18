@@ -1,43 +1,92 @@
+/* global google */
 import React, { Component } from 'react';
 import {connect} from 'react-redux'
+
 import * as actionsType from '../../store/actions/actionTypes'
 
-import { withScriptjs, withGoogleMap, GoogleMap, Marker } from "react-google-maps"
+import style from "./Heatmap.css"
+
+let map;
 
 class Heatmap extends Component {
-    render () {
-        const HOC = withScriptjs(withGoogleMap((props) =>
-            <GoogleMap
-                defaultZoom={19}
-                defaultCenter={{lat: -33.879944, lng:151.203373}}
-                >
-                {props.isMarkerShown && <Marker position={{lat: -33.879944, lng:151.203373}} />}
-            </GoogleMap>
-        ))
 
+    constructor(props){
+        super(props);
+        this.state = {
+            // zoom: 19
+        }
+    }
+
+    componentDidMount(){
+        this._initMap()
+    }
+
+    _initMap () {
+        map = new window.google.maps.Map(document.getElementById('map'),{
+          center: this.props.center,
+          zoom: this.props.zoom,
+          zoomControl: true,
+          zoomControlOptions: {
+            position: window.google.maps.ControlPosition.RIGHT_CENTER
+          },
+          scrollwheel: false,
+          streetViewControl: false,
+          mapTypeControl: false,
+          mapTypeId: 'roadmap',
+        });
+      }
+
+    render () {
         return (
-            <HOC 
-                isMarkerShown
-                googleMapURL="https://maps.googleapis.com/maps/api/js?key=AIzaSyCg6d8ijsi0gbStSF8lTYlWN3LI5iAS0LY&libraries=geometry,drawing,places,visualization"
-                loadingElement={<div style={{ height: `100%` }} />}
-                containerElement={<div style={{ height: `400px` }} />}
-                mapElement={<div style={{ height: `100%` }} 
-            />}></HOC>
-        );
+            <div>
+                <div className={style.maps} id="map"></div>            
+                <button onClick={() => this.props.onHeatMapInit()}>Test</button>
+            </div>
+        )
     }
 }
 
-// the state here is the global state
 const mapStateToProps = state => {
     return {
-        heatmapData: state.heatmap.heatmapData,
+        zoom: state.heatmap.zoom,
+        center: state.heatmap.center,
+        heatmapRawData: state.heatmap.heatmapRawData,
     };
 };
 
 const mapDispatchToProps = dispatch => {
     return {
-        onHeatmapInit: () => dispatch({type: actionsType.INIT_HEATMAP}),
+        onHeatMapInit: () => dispatch({type: actionsType.INIT_HEATMAP}),
     };
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Heatmap);
+
+
+
+
+    // render () {
+    //     const HOC = withScriptjs(withGoogleMap((props) =>
+    //         <GoogleMap
+    //             defaultZoom={this.props.zoom}
+    //             defaultCenter={this.props.center}
+    //             >
+    //             {props.isMarkerShown && <Marker position={this.props.center} />}
+    //             <HeatmapLayer
+    //                data={this.props.heatmapData}
+    //                options={{radius: 20}} 
+    //             />
+    //             <button onClick={() => this.props.onHeatmapInit()}>Test</button>
+    //         </GoogleMap>
+    //     ))
+
+    //     return (
+    //         <HOC 
+    //             isMarkerShown
+    //             googleMapURL="https://maps.googleapis.com/maps/api/js?key=AIzaSyCg6d8ijsi0gbStSF8lTYlWN3LI5iAS0LY&libraries=geometry,drawing,places,visualization"
+    //             loadingElement={<div style={{ height: `100%` }} />}
+    //             containerElement={<div style={{ height: `600px` }} />}
+    //             mapElement={<div style={{ height: `100%` }} 
+    //         />}></HOC>
+    //     );
+    // }
