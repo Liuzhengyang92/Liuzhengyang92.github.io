@@ -1,10 +1,98 @@
 import React, { Component } from 'react';
-import {connect} from 'react-redux'
+import {connect} from 'react-redux';
+import * as actionsType from '../../store/actions/actionTypes';
+import style from "./Heatmap.css";
+import axios from '../../axios';
 
-import * as actionsType from '../../store/actions/actionTypes'
+let drawingManager;
+let selectedShape;
+let colors = ['#1E90FF', '#FF1493', '#32CD32', '#FF8C00', '#4B0082'];
+let selectedColor;
+let colorButtons = {};
+let google = window.google;
+//
+function buildColorPalette () {
+//    let colorPalette = document.getElementById('color-palette');
+    for (let i = 0; i < colors.length; ++i) {
+        let currColor = colors[i];
+        let colorButton = makeColorButton(currColor);
+        // colorPalette.appendChild(colorButton);
+        colorButtons[currColor] = colorButton;
+    }
+    selectColor(colors[0]);
+}
 
-import style from "./Heatmap.css"
-import axios from '../../axios'
+function clearSelection () {
+    if (selectedShape) {
+        if (selectedShape.type !== 'marker') {
+            selectedShape.setEditable(false);
+        }
+        selectedShape = null;
+    }
+}
+
+function setSelection (shape) {
+    if (shape.type !== 'marker') {
+        clearSelection();
+        shape.setEditable(true);
+        selectColor(shape.get('fillColor') || shape.get('strokeColor'));
+    }
+    selectedShape = shape;
+}
+
+function deleteSelectedShape () {
+    if (selectedShape) {
+//        selectedShape.set(null);
+        selectedShape.setMap(null);
+    }
+}
+
+function selectColor (color) {
+    selectedColor = color;
+    for (let i = 0; i < colors.length; ++i) {
+        let currColor = colors[i];
+        colorButtons[currColor].style.border = currColor == color ? '2px solid #789' : '2px solid #fff';
+    }
+
+    let polylineOptions = drawingManager.get('polylineOptions');
+    polylineOptions.strokeColor = color;
+    drawingManager.set('polylineOptions', polylineOptions);
+
+    let rectangleOptions = drawingManager.get('rectangleOptions');
+    rectangleOptions.fillColor = color;
+    drawingManager.set('rectangleOptions', rectangleOptions);
+
+    let circleOptions = drawingManager.get('circleOptions');
+    circleOptions.fillColor = color;
+    drawingManager.set('circleOptions', circleOptions);
+
+    let polygonOptions = drawingManager.get('polygonOptions');
+    polygonOptions.fillColor = color;
+    drawingManager.set('polygonOptions', polygonOptions);
+}
+
+function setSelectedShapeColor (color) {
+    if (selectedShape) {
+        if (selectedShape.type == google.maps.drawing.OverlayType.POLYLINE) {
+            selectedShape.set('strokeColor', color);
+        } else {
+            selectedShape.set('fillColor', color);
+        }
+    }
+}
+//
+function makeColorButton (color) {
+    let button = document.createElement('span');
+    button.class = document.getElementById('color-button');
+    button.style.backgroundColor = color;
+    google.maps.event.addListener(button, 'click', function () {
+        selectColor(color);
+        setSelectedShapeColor(color);
+    });
+
+    return button;
+}
+
 
 class Heatmap extends Component {
 
@@ -16,6 +104,7 @@ class Heatmap extends Component {
     }
 
     __initMap(){
+       // buildColorPalette();
         const map = new window.google.maps.Map(document.getElementById('map'),{
             center: this.props.center,
             zoom: this.props.zoom,
@@ -30,33 +119,91 @@ class Heatmap extends Component {
             map: map
         })
 
-        const drawingManager = new window.google.maps.drawing.DrawingManager({
+        //set polyOptions  added on 19/09
+        const polyOptions = {
+            strokeWeight: 0,
+            fillOpacity: 0.45,
+            editable: true,
+            draggable: true
+        }
+
+
+        drawingManager = new window.google.maps.drawing.DrawingManager({
             map: map,
-            // drawingMode: window.google.maps.drawing.OverlayType.MARKER,
-            drawingControl: true,
+            //drawingMode: window.google.maps.drawing.OverlayType.MARKER,
+            // drawingMode: google.maps.drawing.OverlayType.POLYGON,
+            // drawingControl: true,
             drawingControlOptions: {
-              position: window.google.maps.ControlPosition.TOP_CENTER,
-              drawingModes: ['polygon', 'polyline']
+                position: window.google.maps.ControlPosition.TOP_CENTER,
+//              drawingModes: []
             },
-            polygonOptions: {
-                fillColor: '#37b5eb',
-                fillOpacity: 0.3,
-                strokeWeight: 3,
-                strokeColor: '#1873e2',
-                clickable: true,
-                editable: true,
-                zIndex: 1
-              },
+            markerOptions: {
+                draggable: true
+            },
+
+            polygonOptions: polyOptions,
+              //   {
+              //   fillColor: '#37b5eb',
+              //   fillOpacity: 0.3,
+              //   strokeWeight: 3,
+              //   strokeColor: '#1873e2',
+              //   clickable: true,
+              //   draggable: true,
+              //   editable: true,
+              //   zIndex: 1
+              // },
             polylineOptions: {
                 strokeWeight: 3,
                 strokeColor: '#fd2e2e',
                 strokeOpacity: 0.7,
                 clickable: true,
+                draggable: true,
                 editable: true,
                 zIndex: 1
               },
+            rectangleOptions: polyOptions,
+            circleOptions: polyOptions,
           });
 
+        google.maps.event.addListener(drawingManager, 'overlaycomplete', function (e) {
+            let newShape = e.overlay;
+
+            newShape.type = e.type;
+
+            if (e.type !== google.maps.drawing.OverlayType.MARKER) {
+                drawingManager.setDrawingMode(null);
+                google.maps.event.addListener(newShape, 'click', function(e){
+                    if (e.vertex !== undefined) {
+                        if (newShape.type === google.maps.drawing.OverlayType.POLYGON) {
+                            let path = newShape.getPaths().getAt(e.path);
+                            path.removeAt(e.vertex);
+                            if (path.length < 3) {
+                                newShape.setMap(null);
+                            }
+                        }
+
+                        if (newShape.type === google.maps.drawing.OverlayType.POLYLINE) {
+                            let path = newShape.getPath();
+                            path.removeAt(e.vertex);
+                            if (path.length < 2) {
+                                newShape.setMap(null);
+                            }
+                        }
+                    }
+                    setSelection(newShape);
+                });
+                setSelection(newShape);
+
+            }
+            else {
+                google.maps.event.addListener(newShape, 'click', function (e) {
+                    setSelection(newShape);
+                });
+                setSelection(newShape);
+            }
+        });
+
+        buildColorPalette();
         this.props.onHeatmapInit(map,heatmapLayer,drawingManager)
     }
 
@@ -133,11 +280,24 @@ class Heatmap extends Component {
     }
 
     render () {
+        console.log(selectedShape);
+//        console.log(shape);
         return (
             <div>
-                <div className={style.maps} id="map"></div>            
-                <button onClick={() => this.props.onHeatMapUpdate()}>Test</button>
-                <button onClick={() => this.__heatmapDisplayHandler()}>Hide/Show Heatmap</button>
+                <div className={style.maps} id="map"></div>
+                <label>Please Select Color: </label>
+                <div>
+                    <button onClick={() => selectColor("#1E90FF") }>Blue</button>
+                    <button onClick={() => selectColor("#FF1493") }>Pink</button>
+                    <button onClick={() => selectColor("#32CD32") }>Green</button>
+                    <button onClick={() => selectColor("#FF8C00") }>Orange</button>
+                    <button onClick={() => selectColor("#4B0082") }>Purple</button>
+                </div>
+                <div>
+                    <button onClick={() => this.props.onHeatMapUpdate()}>Test</button>
+                    <button onClick={() => this.__heatmapDisplayHandler()}>Hide/Show Heatmap</button>
+                    <button onClick={() => deleteSelectedShape()}>Delete Selected Shape</button>
+                </div>
             </div>
         )
     }
