@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import Aux from '../Aux/Aux';
+import Aux from '../Auxiliary/Auxiliary';
 
 class Layout extends Component {
     render () {
