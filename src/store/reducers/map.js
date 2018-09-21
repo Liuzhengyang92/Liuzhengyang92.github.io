@@ -1,7 +1,6 @@
 import * as actionTypes from '../actions/actionTypes';
 import { updateObject } from '../../shared/utility';
 
-
 const initialState = {
     map: null,
     heatmapLayer: null,
@@ -14,27 +13,32 @@ const initialState = {
     apiDataInterval: 1,
 }
 
-const heatmapInit = ( state, action ) => {
+const initMap = ( state, action ) => {
     return updateObject( state, {
-        map: action.payload.map, 
-        heatmapLayer: action.payload.heatmapLayer,
-        drawingManager: action.payload.drawingManager,
+        map: action.payload.map,
     });
 };
 
-const heatmapUpdateDevices = (state, action) => {
+const initHeatmapLayer = (state, action) => {
+    return updateObject( state, {
+        heatmapLayer: action.payload.heatmapLayer,
+    });
+}
+
+const loadHeatmapLayerDeviceData = (state, action) => {
     return updateObject( state, {devices: action.payload.devices});
 };
 
-const heatmapUpdateAccessPoints = (state, action) => {
+const loadHeatmapLayerAccessPointData = (state, action) => {
     return updateObject( state, {accesspoints: action.payload.accesspoints});
 };
 
 const reducer = ( state = initialState, action ) => {
     switch ( action.type ) {
-        case actionTypes.INIT_HEATMAP: return heatmapInit(state, action);
-        case actionTypes.UPDATE_DEVICES_HEATMAP: return heatmapUpdateDevices(state, action);
-        case actionTypes.UPDATE_ACCESSPOINTS_HEATMAP: return heatmapUpdateAccessPoints(state, action);
+        case actionTypes.INIT_MAP: return initMap(state, action);
+        case actionTypes.INIT_HEATMAPLAYER: return initHeatmapLayer(state, action);
+        case actionTypes.LOAD_HEATMAPLAYER_DEVICE_DATA: return loadHeatmapLayerDeviceData(state, action);
+        case actionTypes.LOAD_HEATMAPLAYER_ACCESSPOINT_DATA: return loadHeatmapLayerAccessPointData(state, action);
         default:
             return state;
     }

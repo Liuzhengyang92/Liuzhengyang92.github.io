@@ -6,10 +6,12 @@ import { createStore, combineReducers }  from 'redux';
 import './index.css';
 import App from './App';
 import registerServiceWorker from './registerServiceWorker';
-import heatmapReducer from './store/reducers/heatmap'
+// import heatmapReducer from './store/reducers/heatmap'
+import mapReducer from './store/reducers/map'
 
 const rootReducer = combineReducers({
-    heatmap: heatmapReducer,
+    map: mapReducer,
+    // heatmap: heatmapReducer,
 });
 
 const store = createStore(rootReducer);
