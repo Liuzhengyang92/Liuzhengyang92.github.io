@@ -1,6 +1,6 @@
 import React, {Component} from 'react'
 import GeoMonitorCard from '../GeoMonitorCard'
-import EntryZoneTable from '../../../components/Chartjs/Table/EntryZoneTable';
+import OverviewTable from '../../../components/Chartjs/Table/OverviewTable';
 
 class EntryZoneMonitor extends Component {
     
@@ -9,9 +9,9 @@ class EntryZoneMonitor extends Component {
     render () {
         return (
             <GeoMonitorCard
-                title={'Entry Zone Recognition'}
+                title={'Overview Table'}
             >
-            <EntryZoneTable />
+            <OverviewTable />
             </GeoMonitorCard>
         )
     }
