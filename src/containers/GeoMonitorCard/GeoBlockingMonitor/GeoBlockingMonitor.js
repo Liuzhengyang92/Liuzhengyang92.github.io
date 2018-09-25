@@ -1,6 +1,7 @@
 import React, {Component} from 'react'
 
 import GeoMonitorCard from '../GeoMonitorCard'
+import Typography from '@material-ui/core/Typography';
 
 const data = {
     labels: ['Jan', 'Feb', 'Mar', 'Apl', 'May', 'Jun', 'Jul', 'Aug','Sep'],
@@ -34,9 +35,10 @@ class GeoBlockingMonitor extends Component {
         return (
             <GeoMonitorCard
                 title={'Geo Blocking'}
-                context={'Targeting Devices: 1208'}
                 data={data}
-            />
+            >
+                <Typography>Number of Devices: 5332</Typography>                                            
+            </GeoMonitorCard>
         )
     }
 }

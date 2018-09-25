@@ -10,6 +10,7 @@ import Aux from '../../hocs/Auxiliary/Auxiliary';
 
 import GeoFencingMonitor from '../GeoMonitorCard/GeoFencingMonitor/GeoFencingMonitor'
 import GeoBlockingMonitor from '../GeoMonitorCard/GeoBlockingMonitor/GeoBlockingMonitor'
+import EntryZoneMonitor from '../GeoMonitorCard/EntryZoneMonitor/EntryZoneMonitor'
 
 // import GeoMonitorCard from '../GeoMonitorCard/GeoMonitorCard';
 // import Line from "../../components/Chartjs/Line/Line"
@@ -41,10 +42,16 @@ class Map extends Component {
                             </GoogleMap>
                     </Grid>
                     <Grid item xs={4}>
-                            <GeoFencingMonitor />
-                            <GeoBlockingMonitor />
+                        <EntryZoneMonitor />
+                    </Grid>  
+                    <Grid item xs={6}>
+                        <GeoFencingMonitor />
                     </Grid>
+                    <Grid item xs={6}>
+                        <GeoBlockingMonitor />
+                    </Grid>                 
                 </Grid>
+                
             </Aux>
         )
     }

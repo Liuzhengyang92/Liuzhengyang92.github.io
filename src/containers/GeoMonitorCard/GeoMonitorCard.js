@@ -50,10 +50,10 @@ class GeoMonitorCard extends Component {
                         </Grid>
                         { this.state.enable ?
                             <Grid item xs={12}>
-                                <Typography>
-                                    {this.props.context}
-                                </Typography>
-                                <Line height={100} data={this.props.data} />
+                                {this.props.children}
+                                { this.props.data !== undefined ?
+                                    <Line height={100} data={this.props.data} /> : null
+                                }
                             </Grid> : null
                         }
                     </Grid>
