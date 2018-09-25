@@ -25,6 +25,12 @@ const initHeatmapLayer = (state, action) => {
     });
 }
 
+const initDrawingTools = (state, action) => {
+    return updateObject( state, {
+        drawingManager: action.payload.drawingManager,
+    });
+}
+
 const loadHeatmapLayerDeviceData = (state, action) => {
     return updateObject( state, {devices: action.payload.devices});
 };
@@ -37,6 +43,7 @@ const reducer = ( state = initialState, action ) => {
     switch ( action.type ) {
         case actionTypes.INIT_MAP: return initMap(state, action);
         case actionTypes.INIT_HEATMAPLAYER: return initHeatmapLayer(state, action);
+        case actionTypes.INIT_DRAWINGTOOLS: return initDrawingTools(state, action);
         case actionTypes.LOAD_HEATMAPLAYER_DEVICE_DATA: return loadHeatmapLayerDeviceData(state, action);
         case actionTypes.LOAD_HEATMAPLAYER_ACCESSPOINT_DATA: return loadHeatmapLayerAccessPointData(state, action);
         default:

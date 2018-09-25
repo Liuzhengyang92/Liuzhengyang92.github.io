@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import { Component } from 'react';
 import {connect} from 'react-redux';
 import * as actionsType from '../../../store/actions/actionTypes';
 import axios from '../../../axios';
@@ -29,7 +29,7 @@ class HeatmapLayer extends Component {
             if (this.props.heatmapLayer.getMap() !== null){
                 this.__loadDevices()
             }
-        }, 30000)
+        }, 60000)
         this.setState({...this.state,timer: timer})
     }
 
@@ -47,7 +47,7 @@ class HeatmapLayer extends Component {
 
     render () {
         return (
-            <div></div>
+            null
         )
     }
 
@@ -90,7 +90,7 @@ class HeatmapLayer extends Component {
                         map: this.props.map,
                     });
                     return {lat: accesspoint.latitude, lng:accesspoint.longitude}
-                });
+                });                
                 this.props.onHeatmapLayerLoadAccessPointData(accesspoints);
             }).catch(error => {
                 console.log(error);

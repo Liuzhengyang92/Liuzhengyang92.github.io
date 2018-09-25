@@ -3,6 +3,8 @@ import {connect} from 'react-redux';
 import * as actionsType from '../../../store/actions/actionTypes';
 import style from "./Map.css";
 
+import Aux from '../../../hocs/Auxiliary/Auxiliary'
+
 class Map extends Component {
 
     constructor(props){
@@ -31,9 +33,10 @@ class Map extends Component {
 
     render () {
         return (
-            <div className={style.maps} id="map">
+            <Aux>
+                <div className={style.maps} id="map" /> 
                 {this.props.children}
-            </div>          
+            </Aux>
         )
     }
 }
