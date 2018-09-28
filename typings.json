@@ -1,0 +1,5 @@
+{
+  "globalDependencies": {
+    "react-scrollbar": "registry:dt/react-scrollbar#0.4.1+20170123203653"
+  }
+}

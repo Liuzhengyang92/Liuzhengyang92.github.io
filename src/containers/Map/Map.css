@@ -6,3 +6,9 @@
     height: 150px;
     padding: 10px;
 }
+
+.entryzonemonitor{
+    height: 500px;
+    overflow: 'auto';
+    scroll-behavior: auto;
+}

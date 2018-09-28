@@ -1,5 +1,7 @@
 import React, {Component} from 'react';
 import GoogleMap from '../../components/GoogleMap/Map/Map'
+import axios from '../../axios';
+import * as actionsType from '../../store/actions/actionTypes';
 import HeatmapLayer from '../../components/GoogleMap/HeatmapLayer/HeatmapLayer'
 import DrawingTools from '../../components/GoogleMap/DrawingTools/DrawingTools'
 import EntryZone from '../../components/GoogleMap/EntryZone/EntryZone'
@@ -12,11 +14,9 @@ import Aux from '../../hocs/Auxiliary/Auxiliary';
 import GeoFencingMonitor from '../GeoMonitorCard/GeoFencingMonitor/GeoFencingMonitor'
 import GeoBlockingMonitor from '../GeoMonitorCard/GeoBlockingMonitor/GeoBlockingMonitor'
 import EntryZoneMonitor from '../GeoMonitorCard/EntryZoneMonitor/EntryZoneMonitor'
-import EntryZoneTable from '../../components/Chartjs/Table/EntryZoneTable'
 import TrafficMonitor from '../GeoMonitorCard/TrafficMonitor/TrafficMonitor'
 import DwellTimeMonitor from '../GeoMonitorCard/DwellTimeMonitor/DwellTimeMonitor'
 import PeakTimeMonitor from '../GeoMonitorCard/PeakTimeMonitor/PeakTimeMonitor'
-import VisitTimesMonitor from '../GeoMonitorCard/VisitTimesMonitor/VisitTimesMonitor';
 import OverviewMonitor from '../GeoMonitorCard/OverviewMonitor/OverviewMonitor';
 
 // import GeoMonitorCard from '../GeoMonitorCard/GeoMonitorCard';
@@ -49,7 +49,8 @@ class Map extends Component {
                                 <EntryZone readyToInit={this.state.isMounted}/>
                             </GoogleMap>
                     </Grid>
-                    <Grid item xs={4}>
+
+                    <Grid className={classes.entryzonemonitor} item xs={4}>
                         <EntryZoneMonitor />
                     </Grid>  
 
@@ -60,7 +61,7 @@ class Map extends Component {
                         <GeoBlockingMonitor />
                     </Grid>       
                     
-                    <Grid item xs={4} spacing={16}> 
+                    <Grid item xs={4}> 
                         <TrafficMonitor />
                     </Grid>        
 
@@ -68,7 +69,7 @@ class Map extends Component {
                         <DwellTimeMonitor />
                     </Grid>
 
-                    <Grid item xs={4} spacing={16}>
+                    <Grid item xs={4}>
                         <PeakTimeMonitor />
                     </Grid>
                   

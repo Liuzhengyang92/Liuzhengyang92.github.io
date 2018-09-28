@@ -34,6 +34,7 @@ class HeatmapLayer extends Component {
     }
 
     componentDidUpdate(prevProps){
+        console.log(this.props.map)
         if(this.props.readyToInit & prevProps.map === null){
             this.__init()
             this.__loadData()
